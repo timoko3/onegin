@@ -6,10 +6,10 @@
 #include <stdio.h>
 
 const char* const FILE_NAME               = "onegin.txt";   
-const char* const ALERT_FILE_OPEN_FAILURE = "РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р» %s\n";
+const char* const ALERT_FILE_OPEN_FAILURE = "Ошибка при открытии файла %s\n";
 
 void openFile(FILE** fp);
-void getText(FILE* fp, char strings[][1000]);
+void getText(FILE* fp, char strings[][100]);
 char* myFGets(char* str, int count, FILE* stream);
 
 

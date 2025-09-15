@@ -2,16 +2,17 @@
 
 #include "fileParse.h"
 #include "strFunc.h"
+#include "UI.h"
 
 int main(void){
     FILE* fp;
+    char strings[100][100];
+
     openFile(&fp);
-    char strings[1000][1000];
     getText(fp, strings);
-    // sort();
-    // exportText();
-    printf("%d", myStrCmp(strings[0], strings[1]));
-    printf("%d", myStrCmp(strings[0], strings[1]));
+
+    // временно
+    printf("\n%d\n", myStrCmp(strings[0], strings[1]));
     
     fclose(fp);
 

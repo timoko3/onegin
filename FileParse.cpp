@@ -9,13 +9,13 @@ void openFile(FILE** fp){
 
 }
 
-void getText(FILE* fp, char strings[][1000]){
+void getText(FILE* fp, char strings[][100]){
     assert(fp);
     assert(strings);
 
     int i = 0;
-    while(fgets(strings[i], 1000, fp) != NULL){
-        printf("%s\n", strings[i]);
+    while(fgets(strings[i], 100, fp) != NULL){
+        printf("%s", strings[i]);
         i++;
     }
 
