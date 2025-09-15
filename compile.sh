@@ -1,0 +1,1 @@
+g++ main.cpp FileParse.cpp strFunc.cpp -o onegin.out
