@@ -1,5 +1,9 @@
 #include "fileParse.h"
 
+#include <sys/stat.h>
+
+static int countStrings(char* buf, int fileSize);
+
 void openFile(FILE** fp){
     assert(fp);
 
@@ -9,33 +13,48 @@ void openFile(FILE** fp){
 
 }
 
-void getText(FILE* fp, char strings[][100]){
+void getText(FILE* fp, char** strings, int fileSize){
     assert(fp);
     assert(strings);
+    char* buffer = (char*) calloc(fileSize, sizeof(char)); 
+    fread(buffer, sizeof(char), fileSize, fp);
 
+    int nStrings = countStrings(buffer, fileSize);
+    
+    strings = (char**) calloc(nStrings, sizeof(char*));
+
+
+    int curStr = 1;
     int i = 0;
-    while(fgets(strings[i], 100, fp) != NULL){
-        printf("%s", strings[i]);
+    strings[0] = buffer;
+    while(i < fileSize){
+        if(buffer[i] == '\0'){
+            strings[curStr] = buffer + i;
+            curStr++;
+        }
         i++;
     }
 
+    for(int j = 0; j < nStrings; j++){
+        printf("%s\n", strings[j]);
+    }
     
+    free(buffer);
 }
 
-char* myFGets(char* str, int count, FILE* stream){
-    assert(str);
-    assert(stream);
-    if(count < 1)return NULL;
+static int countStrings(char* buf, int fileSize){
+    assert(buf);
+
+    int nStrings = 1;
 
     int i = 0;
-    while(i < count){
-        int ch = fgetc(stream);
-        if(ch == EOF) return NULL;
-        
-        str[i] = (char) ch;
+    while(i < fileSize){
+        if(buf[i] == '\n'){
+            buf[i] = '\0';
+            nStrings++;
+        }
         i++;
     }
-    str[i] = '\0';
 
-    return str;
+    return nStrings;
 }
