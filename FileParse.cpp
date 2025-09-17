@@ -25,8 +25,7 @@ FILE* openFile(){
 
     return fp;
 }
-
-char** getText(FILE* fp, int fileSize){
+char* getTextToBuffer(FILE* fp, int fileSize, int* nStrings){
     assert(fp);
 
     printf(" оличество символов в файле %s(вернул stat) fileSize: %d\n", FILE_NAME, fileSize);
@@ -36,27 +35,44 @@ char** getText(FILE* fp, int fileSize){
     fread(buffer, sizeof(char), fileSize, fp);
     printf(" ол-во символов по-насто€щему прочитанных из файла: %d\n", myStrLen(buffer));
     /////////////можно улучшить
-    int nStrings = countStrings(buffer, fileSize, '\r');
-    
-    char** strings = (char**) calloc(nStrings, sizeof(char*));
+    *nStrings = countStrings(buffer, fileSize, END_STR);
+
+    return buffer;
+}
+
+string* divideBufferToStruct(char* buffer, int nStrings){
+    assert(buffer);
+
+    printf(" ол-во строк Ч %d\n", nStrings  );
+    printf("ƒлина буфера Ч %d", myStrLen(buffer));
+
+    string* strings = (string*) calloc(nStrings, sizeof(string));
     assert(strings);
 
+    printf("јдрес strings Ч %p\n", strings);
+    
+
+    strings[0].stringPtr = buffer;
 
     int curStr = 1;
     int i = 0;
-    strings[0] = buffer;
-    while(i < fileSize){
-        if(buffer[i] == '\0'){
-            strings[curStr] = buffer + i + 1;
+    for(i = 0; buffer[i] != '\0'; i++){
+        /// удалить || buffer[i] == '\n' и помен€ть END_STR при переходе в косноль линукс
+        if((buffer[i] == END_STR || buffer[i] == '\n') && (buffer[i + 1] != '\0')){
+            strings[curStr].stringPtr = buffer + i;
+
+            printf("“екуща€ строкв %d Ч\n", curStr);
+
+            strings[curStr - 1].len = strings[curStr].stringPtr - strings[curStr - 1].stringPtr;
             curStr++;
+
         }
+        printf("—ейчас символ Ч %d\n", buffer[i]);
         i++;
     }
+    printf("curstr Ч %d\n", curStr);
+    strings[curStr - 1].len = (buffer + i) - strings[curStr - 1].stringPtr;
 
-    for(int j = 0; j < nStrings; j++){
-        printf("%s", strings[j]);
-    }
-    
 
     return strings;
 }
@@ -69,7 +85,6 @@ static int countStrings(char* buf, int fileSize, char endStr){
     int i = 0;
     while(i < fileSize){
         if(buf[i] == endStr){
-            buf[i] = '\0';
             nStrings++;
         }
         i++;

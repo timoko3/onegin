@@ -7,20 +7,25 @@
 
 int main(void){
 
-    
     size_t fileSize = getFileSize();
 
     FILE* fp = openFile();
     assert(fp);
 
-    char** strings = getText(fp, fileSize);
-    assert(strings);
-    
+    int nStrings = 0;
 
-    free(strings[0]);
-    strings[0] = NULL;
+    char* buffer = getTextToBuffer(fp, fileSize, &nStrings);
+    assert(buffer);
+    
+    string* strings = divideBufferToStruct(buffer, nStrings);
+    assert(strings);
+
+    for(int i = 0; i < nStrings; i++){
+        printf("%d строка Ч %s ее длина %d, ee адрес Ч %p\n", i,  strings[i].stringPtr, strings[i].len, strings[i].stringPtr);
+    }
+
+    free(buffer);
     free(strings);
-    strings = NULL;
 
     fclose(fp);
 }

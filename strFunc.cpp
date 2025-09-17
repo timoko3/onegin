@@ -25,7 +25,6 @@ int myStrCmp(const char* leftStr, const char* rightStr){
         j++;
     }
 
-
 }
 
 static int myToLower(int* sym){
