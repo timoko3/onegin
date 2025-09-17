@@ -1,5 +1,4 @@
 #include "strFunc.h"
-#include <stdio.h>
 
 static int myToLower(int* sym);
 static void skipPunct(int* ch1, int* ch2, int i, int j, const char* leftStr, const char* rightStr);
@@ -56,4 +55,13 @@ static void skipPunct(int* ch1, int* ch2, int i, int j, const char* leftStr, con
             break;
         }
     }
+}
+
+size_t myStrLen(const char* start){
+    assert(start);
+
+    int i = 0;
+    while(start[i] != '\0') i++;
+
+    return i;
 }

@@ -3,6 +3,5 @@
 
 #include <stdio.h>
 
-void printEncoding();
 
 #endif /*UI_H*/

@@ -6,23 +6,21 @@
 #include "UI.h"
 
 int main(void){
-    FILE* fp;
-    char** strings;
-    struct stat file_info;
 
-    if(stat(FILE_NAME, &file_info) != 0){
-        fprintf(stderr, "Ошибка при попытке получить информацию о файле\n");
-        return 1;
-    }
     
+    size_t fileSize = getFileSize();
+
+    FILE* fp = openFile();
+    assert(fp);
+
+    char** strings = getText(fp, fileSize);
+    assert(strings);
     
 
-    openFile(&fp);
-    getText(fp, strings, file_info.st_size);
+    free(strings[0]);
+    strings[0] = NULL;
+    free(strings);
+    strings = NULL;
 
-    // // временно
-    // printf("\n%d\n", myStrCmp(strings[0], strings[1]));
-    
-    // fclose(fp);
-
+    fclose(fp);
 }
