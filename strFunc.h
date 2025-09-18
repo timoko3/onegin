@@ -5,6 +5,8 @@
 #include <assert.h>
 #include <stdio.h>
 
+typedef int (*comparator) (const char* leftstr, const char* rightStr);
+
 struct string {
     char* stringPtr;
     size_t len;
@@ -16,8 +18,9 @@ const int UPPER_TO_LOWER_SHIFT = 32;
 
 const char END_STR             = '\n';
 
-int myStrCmp(const char* leftStr, const char* rightStr);
-size_t myStrLen(const char* start);
-string* sortStrings(string* strings, size_t nStrings);
+int myStrCmpFromBegin(const char* leftStr, const char* rightStr);
+int myStrCmpFromEnd(const char* leftStr, const char* rightStr);
+size_t myStrLen(const char* start, char endStr);
+string* sortStrings(string* strings, size_t nStrings, comparator comparatorFunc);
 
 #endif /* STR_FUNC_H */

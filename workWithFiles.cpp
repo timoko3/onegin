@@ -32,11 +32,13 @@ char* getTextToBuffer(FILE* inputFIle, int fileSize, int* nStrings){
     assert(nStrings);
 
     printf("Количество символов в файле %s(вернул stat) fileSize: %d\n", INPUT_FILE_NAME, fileSize);
-    char* buffer = (char*) calloc(fileSize, sizeof(char)); 
+    char* buffer = (char*) calloc(fileSize + 2, sizeof(char)); 
     assert(buffer);
+    buffer[fileSize] = '\r';
+    buffer[fileSize + 1] = '\n';
 
     fread(buffer, sizeof(char), fileSize, inputFIle);
-    printf("Кол-во символов по-настоящему прочитанных из файла: %d\n", myStrLen(buffer));
+    printf("Кол-во символов по-настоящему прочитанных из файла: %d\n", myStrLen(buffer, '\0'));
     
     *nStrings = countStrings(buffer, fileSize, END_STR);
 
@@ -47,7 +49,7 @@ string* divideBufferToStruct(char* buffer, int nStrings){
     assert(buffer);
 
     printf("Кол-во строк — %d\n", nStrings);
-    printf("Длина буфера — %d", myStrLen(buffer));
+    printf("Длина буфера — %d", myStrLen(buffer, '\0'));
 
     string* strings = (string*) calloc(nStrings, sizeof(string));
     assert(strings);
@@ -79,7 +81,7 @@ string* divideBufferToStruct(char* buffer, int nStrings){
 FILE* openOutputFile(){
     FILE* outputFile = NULL;
 
-    if(!(outputFile = fopen(OUTPUT_FILE_NAME, "wb"))){
+    if(!(outputFile = fopen(OUTPUT_FILE_NAME, "w+b"))){
         printf(ALERT_FILE_OPEN_FAILURE, OUTPUT_FILE_NAME);
         return NULL;
     }
@@ -87,11 +89,13 @@ FILE* openOutputFile(){
     return outputFile;
 }
 
-bool writeSortedToFIle(FILE* outputFile, string* strings, size_t nStrings, size_t fileSize){
+bool writeSortedToFIle(FILE* outputFile, string* strings, size_t nStrings, size_t bufferSize){
     assert(outputFile);
     assert(strings);
     
-    char* outputBuffer = (char*) calloc(fileSize, sizeof(char));
+    bool result = true;
+
+    char* outputBuffer = (char*) calloc(bufferSize, sizeof(char));
     assert(outputBuffer);
     
     int curBufInd = 0;
@@ -106,13 +110,14 @@ bool writeSortedToFIle(FILE* outputFile, string* strings, size_t nStrings, size_
         
     }
 
-    printf("\n\nOutput buffer: %s его размер: %d\n", outputBuffer, myStrLen(outputBuffer));
+    printf("\n\nOutput buffer: %s его размер: %d\n", outputBuffer, myStrLen(outputBuffer, '\0'));
 
-    if(fwrite(outputBuffer, sizeof(char), fileSize, outputFile) != fileSize) return false;
+    
+    if(fwrite(outputBuffer, sizeof(char), bufferSize, outputFile) != bufferSize) result = false;
     
     free(outputBuffer);
 
-    return true;
+    return result;
 }
 
 static int countStrings(char* buf, int fileSize, char endStr){
