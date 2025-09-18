@@ -5,9 +5,12 @@
 #include "strFunc.h"
 #include "UI.h"
 
+#define DIVIDE printf("\n");
+
 int main(void){
 
-    size_t fileSize = getFileSize();
+    size_t fileSize = 0;
+    if((fileSize = getFileSize()) == EXIT_FAILURE) return EXIT_FAILURE;
 
     FILE* fp = openFile();
     assert(fp);
@@ -20,9 +23,15 @@ int main(void){
     string* strings = divideBufferToStruct(buffer, nStrings);
     assert(strings);
 
-    for(int i = 0; i < nStrings; i++){
-        printf("%d строка Ч %s ее длина %d, ee адрес Ч %p\n", i,  strings[i].stringPtr, strings[i].len, strings[i].stringPtr);
-    }
+    printOnegin(strings, nStrings);
+    // printf("–езультат myStrCmp Ч %d\n", myStrCmp(strings[0].stringPtr, strings[1].stringPtr));
+    
+    strings = sortStrings(strings, nStrings);
+
+    printf("\n-----------------------\n");
+    
+    printOnegin(strings, nStrings);
+    
 
     free(buffer);
     free(strings);

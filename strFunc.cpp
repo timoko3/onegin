@@ -1,59 +1,86 @@
 #include "strFunc.h"
 
-static int myToLower(int* sym);
-static void skipPunct(int* ch1, int* ch2, int i, int j, const char* leftStr, const char* rightStr);
+static void myToLower(char* sym);
+static void skipPunct(int* curSym, const char* str);
 
 int myStrCmp(const char* leftStr, const char* rightStr){
     assert(leftStr);
     assert(rightStr);
-
-    while(true){
-        int i = 0, j = 0;
-        int ch1 = leftStr[j];
-        int ch2 = rightStr[i];
     
-        skipPunct(&ch1, &ch2, i, j, leftStr, rightStr);
-
-        myToLower(&ch1);
-        myToLower(&ch2);
-
-        if(ch1 == '\0' && ch2 == '\0') return 0;
-        else if(ch1 == ch2) continue;    
-        else return ch1 - ch2;
+    int result = 0;
+    int leftCurSymInd = 0, rightCurSymInd = 0;
+    while(true){
         
-        i++;
-        j++;
+        skipPunct(&leftCurSymInd, leftStr);
+        skipPunct(&rightCurSymInd, rightStr);
+
+        // printf("rightStrCur now — %c\n", rightStr[rightCurSymInd]);
+
+        char leftCurSym = leftStr[leftCurSymInd];
+        char rightCurSym = rightStr[rightCurSymInd];
+
+        myToLower(&leftCurSym);
+        myToLower(&rightCurSym);
+
+        // printf("After myToLower: %c, before: %c\n", leftCurSym, leftStr[leftCurSymInd]);
+
+        if(leftStr[leftCurSymInd] == END_STR && rightStr[rightCurSymInd] == END_STR){
+             result = 0;
+             break;
+        }
+        else if(leftStr[leftCurSymInd] != rightStr[rightCurSymInd]){
+            result = leftStr[leftCurSymInd] - rightStr[rightCurSymInd];
+            break;
+        }
+        
+        leftCurSymInd++;
+        rightCurSymInd++;
     }
 
+    return result;
 }
 
-static int myToLower(int* sym){
+string* sortStrings(string* strings, size_t nStrings){
+    
+    for(size_t i = 0; i < nStrings - 1; i++){
+        for(size_t j = i + 1; j < nStrings; j++){
+            printf("При сравнении %d и %d strcmp вернуло %d\n", i, j,
+                 myStrCmp(strings[i].stringPtr, strings[j].stringPtr));
+            if(myStrCmp(strings[i].stringPtr, strings[j].stringPtr) > 0){
+                printf("Смена!\n");
+                string temp = strings[i];
+                strings[i] = strings[j];
+                strings[j] = temp;
+            }
+            
+        }
+    }
+    
+    return strings;
+}
+
+static void myToLower(char* sym){
     assert(sym);
 
     if((*sym >= UPPER_SYM_MIN) && (*sym <= UPPER_SYM_MAX)){
-        return *sym + UPPER_TO_LOWER_SHIFT;
+        *sym += UPPER_TO_LOWER_SHIFT;
     }
     
-    return *sym;
 }
 
-static void skipPunct(int* ch1, int* ch2, int i, int j, const char* leftStr, const char* rightStr){
-    assert(leftStr);
-    assert(rightStr);
+static void skipPunct(int* curSymInd, const char* str){
+    assert(curSymInd);
+    assert(str);
 
     while(true){
-        if(ispunct(*ch1)){
-            j++;
-            *ch1 = leftStr[j];
-        }
-        else if(ispunct(*ch2)){
-            i++;
-            *ch2 = rightStr[i];
+        if(ispunct(str[*curSymInd])){
+            (*curSymInd)++;
         }
         else{
             break;
         }
     }
+
 }
 
 size_t myStrLen(const char* start){

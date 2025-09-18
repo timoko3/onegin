@@ -1,5 +1,5 @@
 #include "fileParse.h"
-#include "strFunc.h"
+
 
 #include <sys/stat.h>
 
@@ -10,7 +10,7 @@ size_t getFileSize(){
 
     if(stat(FILE_NAME, &file_info) != 0){
         fprintf(stderr, "Ошибка при попытке получить информацию о файле\n");
-        return 1;
+        return EXIT_FAILURE;
     }
 
     return file_info.st_size;
@@ -25,8 +25,10 @@ FILE* openFile(){
 
     return fp;
 }
+
 char* getTextToBuffer(FILE* fp, int fileSize, int* nStrings){
     assert(fp);
+    assert(nStrings);
 
     printf("Количество символов в файле %s(вернул stat) fileSize: %d\n", FILE_NAME, fileSize);
     char* buffer = (char*) calloc(fileSize, sizeof(char)); 
@@ -34,7 +36,7 @@ char* getTextToBuffer(FILE* fp, int fileSize, int* nStrings){
 
     fread(buffer, sizeof(char), fileSize, fp);
     printf("Кол-во символов по-настоящему прочитанных из файла: %d\n", myStrLen(buffer));
-    /////////////можно улучшить
+    
     *nStrings = countStrings(buffer, fileSize, END_STR);
 
     return buffer;
@@ -43,36 +45,32 @@ char* getTextToBuffer(FILE* fp, int fileSize, int* nStrings){
 string* divideBufferToStruct(char* buffer, int nStrings){
     assert(buffer);
 
-    printf("Кол-во строк — %d\n", nStrings  );
+    printf("Кол-во строк — %d\n", nStrings);
     printf("Длина буфера — %d", myStrLen(buffer));
 
     string* strings = (string*) calloc(nStrings, sizeof(string));
     assert(strings);
 
     printf("Адрес strings — %p\n", strings);
-    
 
     strings[0].stringPtr = buffer;
 
     int curStr = 1;
-    int i = 0;
+    int i = 0; // rename
     for(i = 0; buffer[i] != '\0'; i++){
-        /// удалить || buffer[i] == '\n' и поменять END_STR при переходе в косноль линукс
-        if((buffer[i] == END_STR || buffer[i] == '\n') && (buffer[i + 1] != '\0')){
-            strings[curStr].stringPtr = buffer + i;
-
+        printf("Сейчас символ — %d\n", buffer[i]);
+        if((buffer[i] == END_STR) && (buffer[i + 1] != '\0')){
+            strings[curStr].stringPtr = buffer + i + 1  ;
+            
             printf("Текущая строкв %d —\n", curStr);
 
             strings[curStr - 1].len = strings[curStr].stringPtr - strings[curStr - 1].stringPtr;
             curStr++;
 
         }
-        printf("Сейчас символ — %d\n", buffer[i]);
-        i++;
     }
     printf("curstr — %d\n", curStr);
     strings[curStr - 1].len = (buffer + i) - strings[curStr - 1].stringPtr;
-
 
     return strings;
 }

@@ -5,14 +5,12 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "strFunc.h"
+
 const char* const FILE_NAME               = "onegin.txt";   
 const char* const ALERT_FILE_OPEN_FAILURE = "Ошибка при открытии файла %s\n";
-const char END_STR                        = '\r';
 
-struct string {
-    char* stringPtr;
-    size_t len;
-};
+
 
 size_t getFileSize();
 FILE* openFile();
