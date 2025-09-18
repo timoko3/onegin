@@ -1,4 +1,4 @@
-#include "fileParse.h"
+#include "workWithFiles.h"
 
 
 #include <sys/stat.h>
@@ -8,7 +8,7 @@ static int countStrings(char* buf, int fileSize, char endStr);
 size_t getFileSize(){
     struct stat file_info;
 
-    if(stat(FILE_NAME, &file_info) != 0){
+    if(stat(INPUT_FILE_NAME, &file_info) != 0){
         fprintf(stderr, "Ошибка при попытке получить информацию о файле\n");
         return EXIT_FAILURE;
     }
@@ -16,25 +16,26 @@ size_t getFileSize(){
     return file_info.st_size;
 }
 
-FILE* openFile(){
-    FILE* fp;
+FILE* openInputFile(){
+    FILE* inputFile;
 
-    if(!(fp = fopen(FILE_NAME, "rb"))){
-        printf(ALERT_FILE_OPEN_FAILURE, FILE_NAME);
+    if(!(inputFile = fopen(INPUT_FILE_NAME, "rb"))){
+        printf(ALERT_FILE_OPEN_FAILURE, INPUT_FILE_NAME);
+        return NULL;
     }
 
-    return fp;
+    return inputFile;
 }
 
-char* getTextToBuffer(FILE* fp, int fileSize, int* nStrings){
-    assert(fp);
+char* getTextToBuffer(FILE* inputFIle, int fileSize, int* nStrings){
+    assert(inputFIle);
     assert(nStrings);
 
-    printf("Количество символов в файле %s(вернул stat) fileSize: %d\n", FILE_NAME, fileSize);
+    printf("Количество символов в файле %s(вернул stat) fileSize: %d\n", INPUT_FILE_NAME, fileSize);
     char* buffer = (char*) calloc(fileSize, sizeof(char)); 
     assert(buffer);
 
-    fread(buffer, sizeof(char), fileSize, fp);
+    fread(buffer, sizeof(char), fileSize, inputFIle);
     printf("Кол-во символов по-настоящему прочитанных из файла: %d\n", myStrLen(buffer));
     
     *nStrings = countStrings(buffer, fileSize, END_STR);
@@ -73,6 +74,45 @@ string* divideBufferToStruct(char* buffer, int nStrings){
     strings[curStr - 1].len = (buffer + i) - strings[curStr - 1].stringPtr;
 
     return strings;
+}
+
+FILE* openOutputFile(){
+    FILE* outputFile = NULL;
+
+    if(!(outputFile = fopen(OUTPUT_FILE_NAME, "wb"))){
+        printf(ALERT_FILE_OPEN_FAILURE, OUTPUT_FILE_NAME);
+        return NULL;
+    }
+
+    return outputFile;
+}
+
+bool writeSortedToFIle(FILE* outputFile, string* strings, size_t nStrings, size_t fileSize){
+    assert(outputFile);
+    assert(strings);
+    
+    char* outputBuffer = (char*) calloc(fileSize, sizeof(char));
+    assert(outputBuffer);
+    
+    int curBufInd = 0;
+    for(size_t curStrInd = 0; curStrInd < nStrings; curStrInd++){
+        size_t curSymInd = 0;
+        while(curSymInd < strings[curStrInd].len){
+            
+            outputBuffer[curBufInd] = strings[curStrInd].stringPtr[curSymInd];
+            curSymInd++;
+            curBufInd++;
+        }
+        
+    }
+
+    printf("\n\nOutput buffer: %s его размер: %d\n", outputBuffer, myStrLen(outputBuffer));
+
+    if(fwrite(outputBuffer, sizeof(char), fileSize, outputFile) != fileSize) return false;
+    
+    free(outputBuffer);
+
+    return true;
 }
 
 static int countStrings(char* buf, int fileSize, char endStr){

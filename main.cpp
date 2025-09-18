@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <sys\stat.h>
 
-#include "fileParse.h"
+#include "workWithFiles.h"
 #include "strFunc.h"
 #include "UI.h"
 
@@ -12,14 +12,17 @@ int main(void){
     size_t fileSize = 0;
     if((fileSize = getFileSize()) == EXIT_FAILURE) return EXIT_FAILURE;
 
-    FILE* fp = openFile();
-    assert(fp);
+    FILE* inputFIle = NULL;
+    if(!(inputFIle = openInputFile())) return EXIT_FAILURE;
+    assert(inputFIle);
 
     int nStrings = 0;
 
-    char* buffer = getTextToBuffer(fp, fileSize, &nStrings);
+    char* buffer = getTextToBuffer(inputFIle, fileSize, &nStrings);
     assert(buffer);
     
+    fclose(inputFIle);
+
     string* strings = divideBufferToStruct(buffer, nStrings);
     assert(strings);
 
@@ -31,10 +34,17 @@ int main(void){
     printf("\n-----------------------\n");
     
     printOnegin(strings, nStrings);
-    
 
+    FILE* outputFile = NULL;
+    if(!(outputFile = openOutputFile())) return EXIT_FAILURE;
+    assert(outputFile);
+    
+    if(!(writeSortedToFIle(outputFile, strings, nStrings, fileSize))) return EXIT_FAILURE;
+
+
+    fclose(outputFile);
     free(buffer);
     free(strings);
 
-    fclose(fp);
+
 }
