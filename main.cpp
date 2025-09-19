@@ -9,7 +9,7 @@
 #define FILE_DIVIDER fwrite(divider, sizeof(char), SIZE_OF_END_STR, outputFile);
 
 int main(void){
-    char divider[3] = "\r\n";
+    const char divider[] = "\r\n";
 
     size_t fileSize = 0;
     if((fileSize = getFileSize()) == EXIT_FAILURE) return EXIT_FAILURE;

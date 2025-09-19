@@ -9,6 +9,7 @@ size_t getFileSize(){
 
     if(stat(INPUT_FILE_NAME, &file_info) != 0){
         fprintf(stderr, ALERT_GET_INFO_FAILURE);
+        perror(GET_FILE_SIZE_ERROR_DESCRIPTION);
         return EXIT_FAILURE;
     }
 
@@ -19,7 +20,8 @@ FILE* openInputFile(){
     FILE* inputFile = NULL;
 
     if(!(inputFile = fopen(INPUT_FILE_NAME, "rb"))){
-        printf(ALERT_FILE_OPEN_FAILURE, INPUT_FILE_NAME);
+        fprintf(stderr, ALERT_FILE_OPEN_FAILURE, INPUT_FILE_NAME);
+        perror(OPEN_INPUT_FILE_ERROR_DESCRIPTION);
         return NULL;
     }
 
@@ -70,7 +72,8 @@ FILE* openOutputFile(){
     FILE* outputFile = NULL;
 
     if(!(outputFile = fopen(OUTPUT_FILE_NAME, "w+b"))){
-        printf(ALERT_FILE_OPEN_FAILURE, OUTPUT_FILE_NAME);
+        fprintf(stderr, ALERT_FILE_OPEN_FAILURE, OUTPUT_FILE_NAME);
+        perror(OPEN_OUTPUT_FILE_ERROR_DESCRIPTION);
         return NULL;
     }
 
