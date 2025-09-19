@@ -7,11 +7,10 @@
 
 #include "strFunc.h"
 
-const char* const INPUT_FILE_NAME               = "onegin.txt";   
+const char* const INPUT_FILE_NAME         = "onegin1.txt";   
 const char* const OUTPUT_FILE_NAME        = "oneginMcPushkaEdition.txt";
 const char* const ALERT_FILE_OPEN_FAILURE = "Ошибка при открытии файла %s\n";
-
-
+const char* const ALERT_GET_INFO_FAILURE  = "Ошибка при попытке получить информацию о файле\n";
 
 size_t getFileSize();
 FILE* openInputFile();

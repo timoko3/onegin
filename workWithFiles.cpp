@@ -1,6 +1,5 @@
 #include "workWithFiles.h"
 
-
 #include <sys/stat.h>
 
 static int countStrings(char* buf, int fileSize, char endStr);
@@ -9,7 +8,7 @@ size_t getFileSize(){
     struct stat file_info;
 
     if(stat(INPUT_FILE_NAME, &file_info) != 0){
-        fprintf(stderr, "ќшибка при попытке получить информацию о файле\n");
+        fprintf(stderr, ALERT_GET_INFO_FAILURE);
         return EXIT_FAILURE;
     }
 
@@ -17,7 +16,7 @@ size_t getFileSize(){
 }
 
 FILE* openInputFile(){
-    FILE* inputFile;
+    FILE* inputFile = NULL;
 
     if(!(inputFile = fopen(INPUT_FILE_NAME, "rb"))){
         printf(ALERT_FILE_OPEN_FAILURE, INPUT_FILE_NAME);
@@ -31,14 +30,12 @@ char* getTextToBuffer(FILE* inputFIle, int fileSize, int* nStrings){
     assert(inputFIle);
     assert(nStrings);
 
-    printf(" оличество символов в файле %s(вернул stat) fileSize: %d\n", INPUT_FILE_NAME, fileSize);
-    char* buffer = (char*) calloc(fileSize + 2, sizeof(char)); 
+    char* buffer = (char*) calloc(fileSize + SIZE_OF_END_STR, sizeof(char)); 
     assert(buffer);
     buffer[fileSize] = '\r';
     buffer[fileSize + 1] = '\n';
 
     fread(buffer, sizeof(char), fileSize, inputFIle);
-    printf(" ол-во символов по-насто€щему прочитанных из файла: %d\n", myStrLen(buffer, '\0'));
     
     *nStrings = countStrings(buffer, fileSize, END_STR);
 
@@ -48,32 +45,23 @@ char* getTextToBuffer(FILE* inputFIle, int fileSize, int* nStrings){
 string* divideBufferToStruct(char* buffer, int nStrings){
     assert(buffer);
 
-    printf(" ол-во строк Ч %d\n", nStrings);
-    printf("ƒлина буфера Ч %d", myStrLen(buffer, '\0'));
-
     string* strings = (string*) calloc(nStrings, sizeof(string));
     assert(strings);
-
-    printf("јдрес strings Ч %p\n", strings);
 
     strings[0].stringPtr = buffer;
 
     int curStr = 1;
-    int i = 0; // rename
-    for(i = 0; buffer[i] != '\0'; i++){
-        printf("—ейчас символ Ч %d\n", buffer[i]);
-        if((buffer[i] == END_STR) && (buffer[i + 1] != '\0')){
-            strings[curStr].stringPtr = buffer + i + 1  ;
-            
-            printf("“екуща€ строкв %d Ч\n", curStr);
-
-            strings[curStr - 1].len = strings[curStr].stringPtr - strings[curStr - 1].stringPtr;
+    int curSym = 0;
+    for(curSym = 0; buffer[curSym] != '\0'; curSym++){
+        if((buffer[curSym] == END_STR) && (buffer[curSym + 1] != '\0')){
+            strings[curStr].stringPtr = buffer + curSym + 1;
+            strings[curStr - 1].len = strings[curStr].stringPtr - 
+                                      strings[curStr - 1].stringPtr;
             curStr++;
-
         }
     }
-    printf("curstr Ч %d\n", curStr);
-    strings[curStr - 1].len = (buffer + i) - strings[curStr - 1].stringPtr;
+
+    strings[curStr - 1].len = (buffer + curSym) - strings[curStr - 1].stringPtr;
 
     return strings;
 }
@@ -109,12 +97,8 @@ bool writeSortedToFIle(FILE* outputFile, string* strings, size_t nStrings, size_
         }
         
     }
-
-    printf("\n\nOutput buffer: %s его размер: %d\n", outputBuffer, myStrLen(outputBuffer, '\0'));
-
     
     if(fwrite(outputBuffer, sizeof(char), bufferSize, outputFile) != bufferSize) result = false;
-    
     free(outputBuffer);
 
     return result;
@@ -125,12 +109,12 @@ static int countStrings(char* buf, int fileSize, char endStr){
 
     int nStrings = 1;
 
-    int i = 0;
-    while(i < fileSize){
-        if(buf[i] == endStr){
+    int curSym = 0;
+    while(curSym < fileSize){
+        if(buf[curSym] == endStr){
             nStrings++;
         }
-        i++;
+        curSym++;
     }
 
     return nStrings;

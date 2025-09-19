@@ -6,68 +6,52 @@
 #include "UI.h"
 
 #define DIVIDE printf("\n-----------------------\n");
-#define FILE_DIVIDER fwrite(divider, sizeof(char), 2, outputFile);
+#define FILE_DIVIDER fwrite(divider, sizeof(char), SIZE_OF_END_STR, outputFile);
 
 int main(void){
+    char divider[3] = "\r\n";
 
     size_t fileSize = 0;
     if((fileSize = getFileSize()) == EXIT_FAILURE) return EXIT_FAILURE;
 
-    FILE* inputFIle = NULL;
-    if(!(inputFIle = openInputFile())) return EXIT_FAILURE;
+    FILE* inputFIle = openInputFile();
+    if(!inputFIle) return EXIT_FAILURE;
     assert(inputFIle);
 
     int nStrings = 0;
-
     char* buffer = getTextToBuffer(inputFIle, fileSize, &nStrings);
     assert(buffer);
     
     fclose(inputFIle);
     
-    size_t bufferSize = fileSize + 2;
+    size_t bufferSize = fileSize + SIZE_OF_END_STR;
 
     string* strings = divideBufferToStruct(buffer, nStrings);
     assert(strings);
 
-    printOnegin(strings, nStrings);
-    // printf("–езультат myStrCmpFromBegin Ч %d\n", myStrCmpFromBegin(strings[0].stringPtr, strings[1].stringPtr));
+    //  printOnegin(strings, nStrings);
     
-    FILE* outputFile = NULL;
-    if(!(outputFile = openOutputFile())) return EXIT_FAILURE;
+    FILE* outputFile = openOutputFile();
+    if(!outputFile) return EXIT_FAILURE;
     assert(outputFile);
 
-    /// +6 дл€ символов новой строки 
-    setvbuf(outputFile, NULL, _IOFBF, sizeof(char) * (3 * bufferSize + 6));
-
-    /// дл€ линукса помен€ть
-    char divider[3] = "\r\n";
+    setvbuf(outputFile, NULL, _IOFBF, 3 * sizeof(char) * (bufferSize + SIZE_OF_END_STR));
 
     strings = sortStrings(strings, nStrings, myStrCmpFromBegin);
-
-    DIVIDE
-    
-    printOnegin(strings, nStrings);
-
-    
+    //printOnegin(strings, nStrings);
     if(!(writeSortedToFIle(outputFile, strings, nStrings, bufferSize))) return EXIT_FAILURE;
 
     strings = sortStrings(strings, nStrings, myStrCmpFromEnd);
-
     DIVIDE
     FILE_DIVIDER
-
-    printOnegin(strings, nStrings);
-
+    //printOnegin(strings, nStrings);
     if(!(writeSortedToFIle(outputFile, strings, nStrings, bufferSize))) return EXIT_FAILURE;
 
     FILE_DIVIDER
-
     fwrite(buffer, sizeof(char), bufferSize, outputFile);
-
 
     fclose(outputFile);
     free(buffer);
     free(strings);
-
 
 }

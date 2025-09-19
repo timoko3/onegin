@@ -5,8 +5,8 @@ static void myPrintf(string string);
 void printOnegin(string* strings, int nStrings){
     assert(strings);
 
-    for(int i = 0; i < nStrings; i++){
-        myPrintf(strings[i]);
+    for(int leftStr = 0; leftStr < nStrings; leftStr++){
+        myPrintf(strings[leftStr]);
     }
     
     
@@ -14,7 +14,7 @@ void printOnegin(string* strings, int nStrings){
 
 static void myPrintf(string string){
     
-    for(size_t i = 0; i < string.len; i++){
-        printf("%c", string.stringPtr[i]);
+    for(size_t leftStr = 0; leftStr < string.len; leftStr++){
+        printf("%c", string.stringPtr[leftStr]);
     }
 }
