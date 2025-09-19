@@ -4,8 +4,56 @@
 
 static int countStrings(char* buf, int fileSize, char endStr);
 
+int stringsFromFileToStructure(DataFromInputFIle* DataFromInputFIle){
+    assert(DataFromInputFIle);
+
+    if((DataFromInputFIle->fileSize = getFileSize()) == EXIT_FAILURE) return EXIT_FAILURE;
+
+    DataFromInputFIle->inputFile = openInputFile();
+    if(!DataFromInputFIle->inputFile) return EXIT_FAILURE;
+    assert(DataFromInputFIle->inputFile);
+
+    
+    DataFromInputFIle->buffer = getTextToBuffer(DataFromInputFIle->inputFile, DataFromInputFIle->fileSize, &DataFromInputFIle->nStrings);
+    assert(DataFromInputFIle->buffer);
+    
+    fclose(DataFromInputFIle->inputFile);
+    
+    DataFromInputFIle->bufferSize = DataFromInputFIle->fileSize + SIZE_OF_END_STR;
+    
+    DataFromInputFIle->strings = divideBufferToStruct(DataFromInputFIle->buffer, DataFromInputFIle->nStrings);
+    assert(DataFromInputFIle->strings);
+    return 0;
+}
+
+int printResultInFile(DataFromInputFIle* DataFromInputFIle){
+    assert(DataFromInputFIle);
+
+    FILE* outputFile = openOutputFile();
+    if(!outputFile) return EXIT_FAILURE;
+    assert(outputFile);
+
+    const char divider[] = "\r\n";
+
+    setvbuf(outputFile, NULL, _IOFBF, 3 * sizeof(char) * (DataFromInputFIle->bufferSize + SIZE_OF_END_STR));
+
+    DataFromInputFIle->strings = sortStrings(DataFromInputFIle->strings, DataFromInputFIle->nStrings, myStrCmpFromBegin);
+    if(!(writeSortedToFIle(outputFile, DataFromInputFIle->strings, DataFromInputFIle->nStrings, DataFromInputFIle->bufferSize))) return EXIT_FAILURE;
+ 
+    DataFromInputFIle->strings = sortStrings(DataFromInputFIle->strings, DataFromInputFIle->nStrings, myStrCmpFromEnd);
+    FILE_DIVIDER
+    if(!(writeSortedToFIle(outputFile, DataFromInputFIle->strings, DataFromInputFIle->nStrings, DataFromInputFIle->bufferSize))) return EXIT_FAILURE;
+
+    FILE_DIVIDER
+    fwrite(DataFromInputFIle->buffer, sizeof(char), DataFromInputFIle->bufferSize, outputFile);
+
+    fclose(outputFile);
+
+    return 0;
+}
+
 size_t getFileSize(){
-    struct stat file_info;
+    struct stat file_info = {}  ;
 
     if(stat(INPUT_FILE_NAME, &file_info) != 0){
         fprintf(stderr, ALERT_GET_INFO_FAILURE);

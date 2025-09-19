@@ -2,6 +2,7 @@
 
 static void myToLower(char* sym);
 static void skipPunct(int* curSym, const char* str, bool sign);
+static void exchangeStrIfNeeded(string* leftStr, string* rightStr, comparator comparatorFunc);
 
 #define PLUS true
 #define MINUS false
@@ -80,12 +81,7 @@ string* sortStrings(string* strings, size_t nStrings, comparator comparatorFunc)
     
     for(size_t leftStrInd = 0; leftStrInd < nStrings - 1; leftStrInd++){
         for(size_t rightStrInd = leftStrInd + 1; rightStrInd < nStrings; rightStrInd++){
-            if(comparatorFunc(strings[leftStrInd].stringPtr, strings[rightStrInd].stringPtr) > 0){
-                string temp = strings[leftStrInd];
-                strings[leftStrInd] = strings[rightStrInd];
-                strings[rightStrInd] = temp;
-            }
-            
+            exchangeStrIfNeeded(&strings[leftStrInd], &strings[rightStrInd], comparatorFunc);
         }
     }
     
@@ -130,3 +126,13 @@ static void skipPunct(int* curSymInd, const char* str, bool sign){
 
 }
 
+static void exchangeStrIfNeeded(string* leftStr, string* rightStr, comparator comparatorFunc){
+    assert(leftStr);
+    assert(rightStr);
+
+    if(comparatorFunc(leftStr->stringPtr, rightStr->stringPtr) > 0){
+        string temp = *leftStr;
+        *leftStr = *rightStr;
+        *rightStr = temp;
+    }
+}
