@@ -4,6 +4,26 @@
 
 static int countStrings(char* buf, int fileSize, char endStr);
 
+static size_t getFileSize();
+static FILE* openInputFile();
+static char* getTextToBuffer(FILE* inputFile, int fileSize, int* nStrings);
+static string* divideBufferToStruct(char* buffer, int nStrings);
+
+static FILE* openOutputFile();
+static bool writeSortedToFIle(FILE* outputFile, string* strings, size_t nStrings, size_t fileSize);
+
+FILE* openLogFile(){
+    FILE* logFile = NULL;
+
+    if(!(logFile = fopen(LOG_FILE_NAME, "w+b"))){
+        fprintf(stderr, ALERT_RUNNING_LOGGING_SYSTEM_FAILURE);
+        perror(FAILURE_OPEN_LOG_FILE);
+        return NULL;
+    }
+
+    return logFile;
+}
+
 int stringsFromFileToStructure(DataFromInputFIle* DataFromInputFIle){
     assert(DataFromInputFIle);
 
@@ -52,7 +72,7 @@ int printResultInFile(DataFromInputFIle* DataFromInputFIle){
     return 0;
 }
 
-size_t getFileSize(){
+static size_t getFileSize(){
     struct stat file_info = {}  ;
 
     if(stat(INPUT_FILE_NAME, &file_info) != 0){
@@ -64,7 +84,7 @@ size_t getFileSize(){
     return file_info.st_size;
 }
 
-FILE* openInputFile(){
+static FILE* openInputFile(){
     FILE* inputFile = NULL;
 
     if(!(inputFile = fopen(INPUT_FILE_NAME, "rb"))){
@@ -76,7 +96,7 @@ FILE* openInputFile(){
     return inputFile;
 }
 
-char* getTextToBuffer(FILE* inputFIle, int fileSize, int* nStrings){
+static char* getTextToBuffer(FILE* inputFIle, int fileSize, int* nStrings){
     assert(inputFIle);
     assert(nStrings);
 
@@ -92,7 +112,7 @@ char* getTextToBuffer(FILE* inputFIle, int fileSize, int* nStrings){
     return buffer;
 }
 
-string* divideBufferToStruct(char* buffer, int nStrings){
+static string* divideBufferToStruct(char* buffer, int nStrings){
     assert(buffer);
 
     string* strings = (string*) calloc(nStrings, sizeof(string));
@@ -116,7 +136,7 @@ string* divideBufferToStruct(char* buffer, int nStrings){
     return strings;
 }
 
-FILE* openOutputFile(){
+static FILE* openOutputFile(){
     FILE* outputFile = NULL;
 
     if(!(outputFile = fopen(OUTPUT_FILE_NAME, "w+b"))){
@@ -128,7 +148,7 @@ FILE* openOutputFile(){
     return outputFile;
 }
 
-bool writeSortedToFIle(FILE* outputFile, string* strings, size_t nStrings, size_t bufferSize){
+static bool writeSortedToFIle(FILE* outputFile, string* strings, size_t nStrings, size_t bufferSize){
     assert(outputFile);
     assert(strings);
     
